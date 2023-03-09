@@ -58,7 +58,7 @@ def main(_argv):
     nms_max_overlap = 1.0
     
     # initialize deep sort
-    model_filename = 'model_data/mars-small128.pb'
+    model_filename = '../../Desktop/yolov4-deepsort-master/model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename, batch_size=1)
     # calculate cosine distance metric
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
