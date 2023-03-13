@@ -1,3 +1,8 @@
+#IMPORTANT BEFORE RUNNING
+#Run the command python save_model.py --model yolov4 to convert the yolov4 weights to tensorflow type
+#The following code is to create and save the yolov4 - tiny weights to tensorflow
+#python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
+
 #to run in terminal for tiny weights:
 # python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --output ./outputs/tiny.avi --tiny
 
@@ -48,8 +53,8 @@ flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when sav
 flags.DEFINE_float('iou', 0.45, 'iou threshold')
 flags.DEFINE_float('score', 0.50, 'score threshold')
 flags.DEFINE_boolean('dont_show', False, 'dont show video output')
-flags.DEFINE_boolean('info', True, 'show detailed info of tracked objects')
-flags.DEFINE_boolean('count', False, 'count objects being tracked on screen')
+flags.DEFINE_boolean('info', False, 'show detailed info of tracked objects')
+flags.DEFINE_boolean('count', True, 'count objects being tracked on screen')
 
 def main(_argv):
     # Definition of the parameters
@@ -58,7 +63,7 @@ def main(_argv):
     nms_max_overlap = 1.0
     
     # initialize deep sort
-    model_filename = '../../Desktop/yolov4-deepsort-master/model_data/mars-small128.pb'
+    model_filename = 'model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename, batch_size=1)
     # calculate cosine distance metric
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
@@ -187,6 +192,10 @@ def main(_argv):
                 names.append(class_name)
         names = np.array(names)
         count = len(names)
+
+        if class_name == "person":
+            cv2.putText(frame, "WARNING -- INDIVIDUAL FOUND ON HIGHWAY AREA!".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
+
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
             print("Objects being tracked: {}".format(count))
