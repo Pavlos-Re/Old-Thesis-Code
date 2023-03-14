@@ -1,22 +1,23 @@
 #IMPORTANT BEFORE RUNNING
+
 #Run the command python save_model.py --model yolov4 to convert the yolov4 weights to tensorflow type
 #The following code is to create and save the yolov4 - tiny weights to tensorflow
 #python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
 
 #to run in terminal for tiny weights:
-# python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --output ./outputs/tiny.avi --tiny
+#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --tiny
 
 #to run in terminal for regular weights:
-#python object_tracker.py --video ./data/video/test.mp4 --output ./outputs/demo.avi --model yolov4
+#python object_tracker.py --video ./data/video/los_angeles.mp4 --model yolov4
 
 #to run it with camera: For regular weights
-#python object_tracker.py --video 0 --output ./outputs/webcam.avi --model yolov4
+#python object_tracker.py --video 0 --model yolov4
 
 #to run it with camera: For tiny weights
-# python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video 0 --output ./outputs/tiny.avi --tiny
-
+#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video 0 --tiny
 
 import os
+
 # comment out below line to enable tensorflow logging outputs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import time
@@ -47,7 +48,7 @@ flags.DEFINE_string('weights', './checkpoints/yolov4-416',
 flags.DEFINE_integer('size', 416, 'resize images to')
 flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
 flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
-flags.DEFINE_string('video', './data/video/test.mp4', 'path to input video or set to 0 for webcam')
+flags.DEFINE_string('video', './data/video/los_angeles.mp4', 'path to input video or set to 0 for webcam')
 flags.DEFINE_string('output', None, 'path to output video')
 flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when saving video to file')
 flags.DEFINE_float('iou', 0.45, 'iou threshold')
@@ -115,6 +116,7 @@ def main(_argv):
         if return_value:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = Image.fromarray(frame)
+            #image.show()
         else:
             print('Video has ended or failed, try a different video format!')
             break
@@ -126,7 +128,7 @@ def main(_argv):
         image_data = image_data[np.newaxis, ...].astype(np.float32)
         start_time = time.time()
 
-        # run detections on tflite if flag is set
+            # run detections on tflite if flag is set
         if FLAGS.framework == 'tflite':
             interpreter.set_tensor(input_details[0]['index'], image_data)
             interpreter.invoke()
@@ -194,7 +196,7 @@ def main(_argv):
         count = len(names)
 
         if class_name == "person":
-            cv2.putText(frame, "WARNING -- INDIVIDUAL FOUND ON HIGHWAY AREA!".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
+            cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
 
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
