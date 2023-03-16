@@ -54,7 +54,7 @@ flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when sav
 flags.DEFINE_float('iou', 0.45, 'iou threshold')
 flags.DEFINE_float('score', 0.50, 'score threshold')
 flags.DEFINE_boolean('dont_show', False, 'dont show video output')
-flags.DEFINE_boolean('info', False, 'show detailed info of tracked objects')
+flags.DEFINE_boolean('info', True, 'show detailed info of tracked objects')
 flags.DEFINE_boolean('count', True, 'count objects being tracked on screen')
 
 def main(_argv):
@@ -62,6 +62,8 @@ def main(_argv):
     max_cosine_distance = 0.4
     nn_budget = None
     nms_max_overlap = 1.0
+
+    dis = []
     
     # initialize deep sort
     model_filename = 'model_data/mars-small128.pb'
@@ -195,8 +197,8 @@ def main(_argv):
         names = np.array(names)
         count = len(names)
 
-        if class_name == "person":
-            cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
+        #if class_name == "person":
+        #    cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
 
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
@@ -230,7 +232,9 @@ def main(_argv):
                 continue 
             bbox = track.to_tlbr()
             class_name = track.get_class()
-            
+
+            dis.append(bbox)
+
         # draw bbox on screen
             color = colors[int(track.track_id) % len(colors)]
             color = [i * 255 for i in color]
@@ -240,8 +244,27 @@ def main(_argv):
 
         # if enable info flag then print details about each track
             if FLAGS.info:
-                print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
+                print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+                                                                                                class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
                 cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
+
+            #print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+            #                                                                                    class_name, (
+            #                                                                                    int(bbox[0]),
+            #                                                                                    int(bbox[1]),
+            #                                                                                    int(bbox[2]),
+            #                                                                                    int(bbox[3]))))
+
+        #for cord in dis:
+        #    print("The result is: ", cord)
+
+        if len(dis) > 0:
+            length = len(dis)
+            for i in range(length):
+                print("The result is: ", dis[i])
+
+
+        dis = []
 
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
