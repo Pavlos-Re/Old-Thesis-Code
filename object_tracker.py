@@ -261,7 +261,11 @@ def main(_argv):
         if len(dis) > 0:
             length = len(dis)
             for i in range(length):
-                print("The result is: ", dis[i])
+                for y in range(length):
+                    #if (i != y):
+                    if (dis[i] == dis[y]).any():
+                        print("The result is: ", dis[i])
+                        #print("The result: ", i, " + ",  y)
 
 
         dis = []
