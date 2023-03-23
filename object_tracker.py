@@ -1,20 +1,20 @@
-#IMPORTANT BEFORE RUNNING
+# IMPORTANT BEFORE RUNNING
 
-#Run the command python save_model.py --model yolov4 to convert the yolov4 weights to tensorflow type
-#The following code is to create and save the yolov4 - tiny weights to tensorflow
-#python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
+# Run the command python save_model.py --model yolov4 to convert the yolov4 weights to tensorflow type
+# The following code is to create and save the yolov4 - tiny weights to tensorflow
+# python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
 
-#to run in terminal for tiny weights:
-#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --tiny
+# to run in terminal for tiny weights:
+# python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --tiny
 
-#to run in terminal for regular weights:
-#python object_tracker.py --video ./data/video/los_angeles.mp4 --model yolov4
+# to run in terminal for regular weights:
+# python object_tracker.py --video ./data/video/los_angeles.mp4 --model yolov4
 
-#to run it with camera: For regular weights
-#python object_tracker.py --video 0 --model yolov4
+# to run it with camera: For regular weights
+# python object_tracker.py --video 0 --model yolov4
 
-#to run it with camera: For tiny weights
-#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video 0 --tiny
+# to run it with camera: For tiny weights
+# python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video 0 --tiny
 
 import os
 
@@ -22,6 +22,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import time
 import tensorflow as tf
+
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -42,6 +43,7 @@ from deep_sort import preprocessing, nn_matching
 from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
+
 flags.DEFINE_string('framework', 'tf', '(tf, tflite, trt')
 flags.DEFINE_string('weights', './checkpoints/yolov4-416',
                     'path to weights file')
@@ -57,6 +59,7 @@ flags.DEFINE_boolean('dont_show', False, 'dont show video output')
 flags.DEFINE_boolean('info', True, 'show detailed info of tracked objects')
 flags.DEFINE_boolean('count', True, 'count objects being tracked on screen')
 
+
 def main(_argv):
     # Definition of the parameters
     max_cosine_distance = 0.4
@@ -64,7 +67,7 @@ def main(_argv):
     nms_max_overlap = 1.0
 
     dis = []
-    
+
     # initialize deep sort
     model_filename = 'model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename, batch_size=1)
@@ -118,11 +121,11 @@ def main(_argv):
         if return_value:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = Image.fromarray(frame)
-            #image.show()
+            # image.show()
         else:
             print('Video has ended or failed, try a different video format!')
             break
-        frame_num +=1
+        frame_num += 1
         print('Frame #: ', frame_num)
         frame_size = frame.shape[:2]
         image_data = cv2.resize(frame, (input_size, input_size))
@@ -130,7 +133,7 @@ def main(_argv):
         image_data = image_data[np.newaxis, ...].astype(np.float32)
         start_time = time.time()
 
-            # run detections on tflite if flag is set
+        # run detections on tflite if flag is set
         if FLAGS.framework == 'tflite':
             interpreter.set_tensor(input_details[0]['index'], image_data)
             interpreter.invoke()
@@ -180,9 +183,9 @@ def main(_argv):
 
         # by default allow all classes in .names file
         allowed_classes = list(class_names.values())
-        
+
         # custom allowed classes (uncomment line below to customize tracker for only people)
-        #allowed_classes = ['person']
+        # allowed_classes = ['person']
 
         # loop through objects and use class index to get class name, allow only classes in allowed_classes list
         names = []
@@ -197,11 +200,12 @@ def main(_argv):
         names = np.array(names)
         count = len(names)
 
-        #if class_name == "person":
+        # if class_name == "person":
         #    cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
 
         if FLAGS.count:
-            cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
+            cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2,
+                        (0, 255, 0), 2)
             print("Objects being tracked: {}".format(count))
         # delete detections that are not in allowed_classes
         bboxes = np.delete(bboxes, deleted_indx, axis=0)
@@ -209,9 +213,10 @@ def main(_argv):
 
         # encode yolo detections and feed to tracker
         features = encoder(frame, bboxes)
-        detections = [Detection(bbox, score, class_name, feature) for bbox, score, class_name, feature in zip(bboxes, scores, names, features)]
+        detections = [Detection(bbox, score, class_name, feature) for bbox, score, class_name, feature in
+                      zip(bboxes, scores, names, features)]
 
-        #initialize color map
+        # initialize color map
         cmap = plt.get_cmap('tab20b')
         colors = [cmap(i)[:3] for i in np.linspace(0, 1, 20)]
 
@@ -220,7 +225,7 @@ def main(_argv):
         scores = np.array([d.confidence for d in detections])
         classes = np.array([d.class_name for d in detections])
         indices = preprocessing.non_max_suppression(boxs, classes, nms_max_overlap, scores)
-        detections = [detections[i] for i in indices]       
+        detections = [detections[i] for i in indices]
 
         # Call the tracker
         tracker.predict()
@@ -229,44 +234,72 @@ def main(_argv):
         # update tracks
         for track in tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
-                continue 
+                continue
             bbox = track.to_tlbr()
             class_name = track.get_class()
 
             dis.append(bbox)
 
-        # draw bbox on screen
+            # draw bbox on screen
             color = colors[int(track.track_id) % len(colors)]
             color = [i * 255 for i in color]
             cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color, 2)
             cv2.rectangle(frame, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)+len(str(track.track_id)))*17, int(bbox[1])), color, -1)
             cv2.putText(frame, class_name + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1]-10)),0, 0.75, (255,255,255),2)
 
-        # if enable info flag then print details about each track
+            # if enable info flag then print details about each track
             if FLAGS.info:
-                print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
-                                                                                                class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
-                cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
+                # print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+                #                                                                                    class_name, (
+                #                                                                                        int(bbox[0]),
+                #                                                                                        int(bbox[1]),
+                #                                                                                        int(bbox[2]),
+                #                                                                                        int(bbox[3]))))
+                cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
 
-            #print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+            # print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
             #                                                                                    class_name, (
             #                                                                                    int(bbox[0]),
             #                                                                                    int(bbox[1]),
             #                                                                                    int(bbox[2]),
             #                                                                                    int(bbox[3]))))
 
-        #for cord in dis:
+        # for cord in dis:
         #    print("The result is: ", cord)
 
         if len(dis) > 0:
             length = len(dis)
             for i in range(length):
                 for y in range(length):
-                    #if (i != y):
-                    if (dis[i] == dis[y]).any():
-                        print("The result is: ", dis[i])
-                        #print("The result: ", i, " + ",  y)
-
+                    if i != y:
+                        if (((dis[i][1] < dis[y][0]) and (dis[i][0] > dis[y][0])) and
+                            ((dis[i][1] < dis[y][0]) and (dis[i][3] > dis[y][0])) and
+                            ((dis[i][1] < dis[y][0]) and (dis[i][2] > dis[y][0])) and
+                            ((dis[i][1] < dis[y][0]) and (dis[i][1] > dis[y][0]))):
+                            print("Warning, possible collision.")
+                            print("Result: ", dis[i][1], " + ", dis[y][0])
+                        elif (((dis[i][1] < dis[y][1]) and (dis[i][0] > dis[y][1])) and
+                            ((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and
+                            ((dis[i][1] < dis[y][1]) and (dis[i][2] > dis[y][1])) and
+                            ((dis[i][1] < dis[y][1]) and (dis[i][1] < dis[y][1]))):
+                            print("Warning, possible collision.")
+                            print("Result: ", dis[i][1], " + ", dis[y][1])
+                        elif (((dis[i][1] < dis[y][2]) and (dis[i][0] > dis[y][2])) and
+                            ((dis[i][1] < dis[y][2]) and (dis[i][3] > dis[y][2])) and
+                            ((dis[i][1] < dis[y][2]) and (dis[i][2] > dis[y][2])) and
+                            ((dis[i][1] < dis[y][2]) and (dis[i][1] < dis[y][2]))):
+                            print("Warning, possible collision.")
+                            print("Result: ", dis[i][1], " + ", dis[y][2])
+                        elif (((dis[i][1] < dis[y][3]) and (dis[i][0] > dis[y][3])) and
+                            ((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and
+                            ((dis[i][1] < dis[y][3]) and (dis[i][2] > dis[y][3])) and
+                            ((dis[i][1] < dis[y][3]) and (dis[i][1] < dis[y][3]))):
+                            print("Warning, possible collision.")
+                            print("Result: ", dis[i][1], " + ", dis[y][3])
+                    # else:
+                    # print("Result: ", dis[i], " + ", dis[y])
+                # print("The result: ", i, " + ",  y)
 
         dis = []
 
@@ -275,15 +308,16 @@ def main(_argv):
         print("FPS: %.2f" % fps)
         result = np.asarray(frame)
         result = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        
+
         if not FLAGS.dont_show:
             cv2.imshow("Output Video", result)
-        
+
         # if output flag is set, save video file
         if FLAGS.output:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     try:
