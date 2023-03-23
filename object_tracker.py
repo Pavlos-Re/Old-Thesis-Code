@@ -249,12 +249,12 @@ def main(_argv):
 
             # if enable info flag then print details about each track
             if FLAGS.info:
-                # print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
-                #                                                                                    class_name, (
-                #                                                                                        int(bbox[0]),
-                #                                                                                        int(bbox[1]),
-                #                                                                                        int(bbox[2]),
-                #                                                                                        int(bbox[3]))))
+                print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+                                                                                                    class_name, (
+                                                                                                        int(bbox[0]),
+                                                                                                        int(bbox[1]),
+                                                                                                        int(bbox[2]),
+                                                                                                        int(bbox[3]))))
                 cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35),
                             cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
 
@@ -268,44 +268,9 @@ def main(_argv):
         # for cord in dis:
         #    print("The result is: ", cord)
 
-        if len(dis) > 0:
-            length = len(dis)
-            for i in range(length):
-                for y in range(length):
-                    if i != y:
-                        if (((dis[i][1] < dis[y][0]) and (dis[i][0] > dis[y][0])) and
-                            ((dis[i][1] < dis[y][0]) and (dis[i][3] > dis[y][0])) and
-                            ((dis[i][1] < dis[y][0]) and (dis[i][2] > dis[y][0])) and
-                            ((dis[i][1] < dis[y][0]) and (dis[i][1] > dis[y][0]))):
-                            print("Warning, possible collision.")
-                            print("Result: ", dis[i][1], " + ", dis[y][0])
-                        elif (((dis[i][1] < dis[y][1]) and (dis[i][0] > dis[y][1])) and
-                            ((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and
-                            ((dis[i][1] < dis[y][1]) and (dis[i][2] > dis[y][1])) and
-                            ((dis[i][1] < dis[y][1]) and (dis[i][1] < dis[y][1]))):
-                            print("Warning, possible collision.")
-                            print("Result: ", dis[i][1], " + ", dis[y][1])
-                        elif (((dis[i][1] < dis[y][2]) and (dis[i][0] > dis[y][2])) and
-                            ((dis[i][1] < dis[y][2]) and (dis[i][3] > dis[y][2])) and
-                            ((dis[i][1] < dis[y][2]) and (dis[i][2] > dis[y][2])) and
-                            ((dis[i][1] < dis[y][2]) and (dis[i][1] < dis[y][2]))):
-                            print("Warning, possible collision.")
-                            print("Result: ", dis[i][1], " + ", dis[y][2])
-                        elif (((dis[i][1] < dis[y][3]) and (dis[i][0] > dis[y][3])) and
-                            ((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and
-                            ((dis[i][1] < dis[y][3]) and (dis[i][2] > dis[y][3])) and
-                            ((dis[i][1] < dis[y][3]) and (dis[i][1] < dis[y][3]))):
-                            print("Warning, possible collision.")
-                            print("Result: ", dis[i][1], " + ", dis[y][3])
-                    # else:
-                    # print("Result: ", dis[i], " + ", dis[y])
-                # print("The result: ", i, " + ",  y)
-
-        dis = []
-
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
-        print("FPS: %.2f" % fps)
+        #print("FPS: %.2f" % fps)
         result = np.asarray(frame)
         result = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
