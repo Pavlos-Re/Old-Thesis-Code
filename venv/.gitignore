@@ -1,5 +1,2 @@
 # created by virtualenv automatically
-*.weights
-*.mp4
-/checkpoints/
-
+*

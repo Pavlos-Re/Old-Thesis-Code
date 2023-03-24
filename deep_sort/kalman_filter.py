@@ -104,6 +104,7 @@ class KalmanFilter(object):
             state. Unobserved velocities are initialized to 0 mean.
 
         """
+
         std_pos = [
             self._std_weight_position * mean[3],
             self._std_weight_position * mean[3],
@@ -175,6 +176,9 @@ class KalmanFilter(object):
         #print("The result is: ", measurement)
 
         projected_mean, projected_cov = self.project(mean, covariance)
+
+
+        #print("The result: ", measurement)
 
         chol_factor, lower = scipy.linalg.cho_factor(
             projected_cov, lower=True, check_finite=False)
