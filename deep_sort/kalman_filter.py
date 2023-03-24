@@ -171,6 +171,9 @@ class KalmanFilter(object):
             Returns the measurement-corrected state distribution.
 
         """
+
+        #print("The result is: ", measurement)
+
         projected_mean, projected_cov = self.project(mean, covariance)
 
         chol_factor, lower = scipy.linalg.cho_factor(
@@ -213,7 +216,6 @@ class KalmanFilter(object):
             Returns an array of length N, where the i-th element contains the
             squared Mahalanobis distance between (mean, covariance) and
             `measurements[i]`.
-
         """
         mean, covariance = self.project(mean, covariance)
         if only_position:

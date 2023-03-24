@@ -246,7 +246,7 @@ def main(_argv):
             if FLAGS.info:
                 print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
                                                                                                 class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
-                cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
+                #cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
 
             #print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
             #                                                                                    class_name, (
@@ -262,11 +262,23 @@ def main(_argv):
             length = len(dis)
             for i in range(length):
                 for y in range(length):
-                    #if (i != y):
-                    if (dis[i] == dis[y]).any():
-                        print("The result is: ", dis[i])
-                        #print("The result: ", i, " + ",  y)
+                    if (i != y):
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))).any():
+                            print("Warning possible collision!", dis[i], " " , dis[y])
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                            print("Warning possible collision!", dis[i], " " , dis[y])
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                            print("Warning possible collision!", dis[i], " " , dis[y])
+                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                            print("Warning possible collision!", dis[i], " " , dis[y])
+                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))).any():
+                            print("Warning possible collision!", dis[i], " ", dis[y])
 
+                    #if i != y:
+                     #   if (((dis[i][1] < dis[y][1])
+                    # else:
+                    # print("Result: ", dis[i], " + ", dis[y])
+                # print("The result: ", i, " + ",  y)
 
         dis = []
 
