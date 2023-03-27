@@ -198,8 +198,8 @@ def main(_argv):
         names = np.array(names)
         count = len(names)
 
-        #if class_name == "person":
-        #    cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
+        if class_name == "person":
+            cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
 
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
@@ -250,14 +250,8 @@ def main(_argv):
                                                                                                 class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
 
 
-            if track.class_name == "person":
-                print("Warning! Individual on road.")
-
-
-
         if len(dis) > 0:
             length = len(dis)
-            dis2 = dis
             for i in range(length):
                 for y in range(length):
                     if (i != y):
