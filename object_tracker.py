@@ -5,7 +5,7 @@
 #python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
 
 #to run in terminal for tiny weights:
-#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/cars.mp4 --tiny
+#python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video ./data/video/input.mp4 --tiny
 
 #to run in terminal for regular weights:
 #python object_tracker.py --video ./data/video/los_angeles.mp4 --model yolov4
@@ -64,6 +64,7 @@ def main(_argv):
     nms_max_overlap = 1.0
 
     dis = []
+    dis2 = []
     
     # initialize deep sort
     model_filename = 'model_data/mars-small128.pb'
@@ -234,6 +235,7 @@ def main(_argv):
             class_name = track.get_class()
 
             dis.append(bbox)
+            dis2.append(bbox)
 
         # draw bbox on screen
             color = colors[int(track.track_id) % len(colors)]
@@ -246,41 +248,33 @@ def main(_argv):
             if FLAGS.info:
                 print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
                                                                                                 class_name, (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))))
-                #cv2.putText(frame, "Objects being tracked: {}".format(class_name), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 255, 0), 2)
 
-            #print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
-            #                                                                                    class_name, (
-            #                                                                                    int(bbox[0]),
-            #                                                                                    int(bbox[1]),
-            #                                                                                    int(bbox[2]),
-            #                                                                                    int(bbox[3]))))
 
-        #for cord in dis:
-        #    print("The result is: ", cord)
+            if track.class_name == "person":
+                print("Warning! Individual on road.")
+
+
 
         if len(dis) > 0:
             length = len(dis)
+            dis2 = dis
             for i in range(length):
                 for y in range(length):
                     if (i != y):
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))).any():
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
                             print("Warning possible collision!", dis[i], " " , dis[y])
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
                             print("Warning possible collision!", dis[i], " " , dis[y])
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
                             print("Warning possible collision!", dis[i], " " , dis[y])
-                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))).any():
+                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
                             print("Warning possible collision!", dis[i], " " , dis[y])
-                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))).any():
+                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and ((dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
                             print("Warning possible collision!", dis[i], " ", dis[y])
 
-                    #if i != y:
-                     #   if (((dis[i][1] < dis[y][1])
-                    # else:
-                    # print("Result: ", dis[i], " + ", dis[y])
-                # print("The result: ", i, " + ",  y)
 
         dis = []
+
 
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
