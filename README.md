@@ -8,3 +8,8 @@ In order to test the code one has to create a video folder inside the data folde
 copy inside the video fiels.
 
 https://mega.nz/folder/4xQW2TzD#bUisH5SFQuy_UkLMxFX57Q
+
+References:
+Big thanks to theAIGuy.
+The majority of the code used was taken from his repository:
+https://github.com/theAIGuysCode/yolov4-deepsort
