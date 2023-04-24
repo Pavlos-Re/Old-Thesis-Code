@@ -22,6 +22,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import time
 import tensorflow as tf
+import requests
 
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -68,6 +69,7 @@ def main(_argv):
 
     dis = []
     dis2 = []
+    dis3 = []
 
     # initialize deep sort
     model_filename = 'model_data/mars-small128.pb'
@@ -201,9 +203,9 @@ def main(_argv):
         names = np.array(names)
         count = len(names)
 
-        if class_name == "person":
-            cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500),
-                        cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
+        # if class_name == "person":
+        #    cv2.putText(frame, "-- WARNING -- POTENTIAL ACCIDENT ON INDIVIDUAL".format(class_name), (500, 500),
+        #                cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255, 0, 0), 2)
 
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2,
@@ -240,7 +242,7 @@ def main(_argv):
             bbox = track.to_tlbr()
             class_name = track.get_class()
 
-            dis.append(bbox)
+            dis.append(track)
             dis2.append(bbox)
 
             # draw bbox on screen
@@ -253,46 +255,61 @@ def main(_argv):
                         (255, 255, 255), 2)
 
             # if enable info flag then print details about each track
-            if FLAGS.info:
-                print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
-                                                                                                    class_name, (
-                                                                                                    int(bbox[0]),
-                                                                                                    int(bbox[1]),
-                                                                                                    int(bbox[2]),
-                                                                                                    int(bbox[3]))))
+            # if FLAGS.info:
+            #    print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id),
+            #                                                                                        class_name, (
+            #                                                                                        int(bbox[0]),
+            #                                                                                        int(bbox[1]),
+            #                                                                                        int(bbox[2]),
+            #                                                                                        int(bbox[3]))))
+
+        # To dis exei tis times twn suntetagmenwn tou kathe oxhmatos
+        # To dis2 exei tis times twn oxhmatwn pou isws exoun sugkroustei
+        # Sthn parakatw epanalhpsh sugkrinoume tis times tou neou dis me tis times tou palioy dis2 gia kathe ena apo ta oxhmata auta
+        # an kapoio apo auta exei thn idia timh paei na pei oti exei stamathsei na kinhte ara polu pithanon na exei ginei atuxhma
 
         if len(dis) > 0:
             length = len(dis)
             for i in range(length):
-                for y in range(length):
-                    if (dis[i][0] == dis2[i][0]) and (dis[i][1] == dis2[i][1]) and (dis[i][2] == dis2[i][2]) and (dis[i][3] == dis2[i][3]):
-                        print("Warning possible collision!", dis[i], " === ", dis2[i])
+                print("The result is: ", dis[i].to_tlbr(), " + ", dis[i].get_class(), " + ", dis[i].track_id)
 
-        if len(dis) > 0:
-            length = len(dis)
-            for i in range(length):
-                for y in range(length):
-                    if (i != y):
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
-                                (dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
-                            # print("Warning possible collision!", dis[i], " " , dis[y])
-                            dis2[i] = dis[i]
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
-                                (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
-                            # print("Warning possible collision!", dis[i], " " , dis[y])
-                            dis2[i] = dis[i]
-                        if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
-                                (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
-                            # print("Warning possible collision!", dis[i], " " , dis[y])
-                            dis2[i] = dis[i]
-                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and (
-                                (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
-                            # print("Warning possible collision!", dis[i], " " , dis[y])
-                            dis2[i] = dis[i]
-                        if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and (
-                                (dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
-                            # print("Warning possible collision!", dis[i], " ", dis[y])
-                            dis2[i] = dis[i]
+        #        for y in range(length):
+        #            if (dis[i][0] == dis2[i][0]) and (dis[i][1] == dis2[i][1]) and (dis[i][2] == dis2[i][2]) and (dis[i][3] == dis2[i][3]):
+        #                print("Warning possible collision!", dis[i], " === ", dis2[i])
+
+        # dis2 = []
+        # dis3 = []
+
+        # if len(dis) > 0:
+        #    length = len(dis)
+        #    for i in range(length):
+        #        for y in range(length):
+        #            if i != y:
+        #                if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
+        #                        (dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
+        #                    print("Warning possible collision!", dis[i], " " , dis[y])
+        #                    dis2[i] = dis[i]
+        # dis3[i] = dis[y]
+        #                if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
+        #                        (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
+        #                    print("Warning possible collision!", dis[i], " " , dis[y])
+        #                    dis2[i] = dis[i]
+        #                    #dis3[i] = dis[y]
+        #                if (((dis[i][1] < dis[y][1]) and (dis[i][3] > dis[y][1])) and (
+        #                        (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
+        #                    print("Warning possible collision!", dis[i], " " , dis[y])
+        #                    dis2[i] = dis[i]
+        # dis3[i] = dis[y]
+        #                if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and (
+        #                        (dis[i][0] < dis[y][0]) and (dis[i][2] > dis[y][0]))):
+        #                    print("Warning possible collision!", dis[i], " " , dis[y])
+        #                    dis2[i] = dis[i]
+        # dis3[i] = dis[y]
+        #                if (((dis[i][1] < dis[y][3]) and (dis[i][3] > dis[y][3])) and (
+        #                        (dis[i][0] < dis[y][2]) and (dis[i][2] > dis[y][2]))):
+        #                    print("Warning possible collision!", dis[i], " ", dis[y])
+        #                    dis2[i] = dis[i]
+        # dis3[i] = dis[y]
 
         dis = []
 
