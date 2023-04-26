@@ -68,7 +68,7 @@ def main(_argv):
     nms_max_overlap = 1.0
 
     dis = []
-    dis2 = []
+    dis1 = []
     dis3 = []
 
     # initialize deep sort
@@ -268,17 +268,23 @@ def main(_argv):
         # Sthn parakatw epanalhpsh sugkrinoume tis times tou neou dis me tis times tou palioy dis2 gia kathe ena apo ta oxhmata auta
         # an kapoio apo auta exei thn idia timh paei na pei oti exei stamathsei na kinhte ara polu pithanon na exei ginei atuxhma
 
-        #if len(dis) > 0:
-        #    length = len(dis)
-        #    for i in range(length):
+        if len(dis) > 0 and len(dis1) > 0:
+            length = len(dis)
+            for i in range(length):
                 #print("The result is: ", dis[i].to_tlbr(), " + ", dis[i].get_class(), " + ", dis[i].track_id)
-        #        print("The result is: ", dis[i].to_tlbr()[0], dis[i].to_tlbr()[1], dis[i].to_tlbr()[2], dis[i].to_tlbr()[3])
+                if dis1[i].to_tlbr()[0] == dis[i].to_tlbr()[0] and dis1[i].to_tlbr()[1] == dis[i].to_tlbr()[1] and dis1[i].to_tlbr()[2] == dis[i].to_tlbr()[2] \
+                        and dis1[i].to_tlbr()[3] == dis[i].to_tlbr()[3]:
+                    print("Warming! ---> Possible collision", dis[i].track_id)
+
         #        for y in range(length):
         #            if (dis[i][0] == dis2[i][0]) and (dis[i][1] == dis2[i][1]) and (dis[i][2] == dis2[i][2]) and (dis[i][3] == dis2[i][3]):
         #                print("Warning possible collision!", dis[i], " === ", dis2[i])
 
         # dis2 = []
         # dis3 = []
+
+
+#Coords = { xmin, ymin, xmax, ymax}
 
         if len(dis) > 0:
             length = len(dis)
@@ -287,26 +293,24 @@ def main(_argv):
                     if i != y:
                         if (((dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[0])) and (
                                 (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " " , dis[y].track_id)
-        #                    dis2[i] = dis[i]
-        # dis3[i] = dis[y]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)        #                    dis2[i] = dis[i]
-                            #dis3[i] = dis[y]
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            dis1[i] = dis[i]
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
                             print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-        #                    dis2[i] = dis[i]
-        # dis3[i] = dis[y]
+                            dis1[i] = dis[i]
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
+                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            dis1[i] = dis[i]
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)        #                    dis2[i] = dis[i]
-        # dis3[i] = dis[y]
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            dis1[i] = dis[i]
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)        #                    dis2[i] = dis[i]
-        # dis3[i] = dis[y]
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            dis1[i] = dis[i]
 
         dis = []
 
@@ -324,7 +328,6 @@ def main(_argv):
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
     cv2.destroyAllWindows()
-
 
 if __name__ == '__main__':
     try:
