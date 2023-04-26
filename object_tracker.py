@@ -268,13 +268,13 @@ def main(_argv):
         # Sthn parakatw epanalhpsh sugkrinoume tis times tou neou dis me tis times tou palioy dis2 gia kathe ena apo ta oxhmata auta
         # an kapoio apo auta exei thn idia timh paei na pei oti exei stamathsei na kinhte ara polu pithanon na exei ginei atuxhma
 
-        if len(dis) > 0 and len(dis1) > 0:
-            length = len(dis)
-            for i in range(length):
-                #print("The result is: ", dis[i].to_tlbr(), " + ", dis[i].get_class(), " + ", dis[i].track_id)
-                if dis1[i].to_tlbr()[0] == dis[i].to_tlbr()[0] and dis1[i].to_tlbr()[1] == dis[i].to_tlbr()[1] and dis1[i].to_tlbr()[2] == dis[i].to_tlbr()[2] \
-                        and dis1[i].to_tlbr()[3] == dis[i].to_tlbr()[3]:
-                    print("Warming! ---> Possible collision", dis[i].track_id)
+        #if len(dis) > 0:
+        #    length = len(dis)
+        #    for i in range(length):
+        #         print("The result is: ", dis[i].to_tlbr(), " + ", dis[i].get_class(), " + ", dis[i].track_id)
+        #        if dis1[i].to_tlbr()[0] == dis[i].to_tlbr()[0] and dis1[i].to_tlbr()[1] == dis[i].to_tlbr()[1] and dis1[i].to_tlbr()[2] == dis[i].to_tlbr()[2] \
+        #                and dis1[i].to_tlbr()[3] == dis[i].to_tlbr()[3]:
+        #            print("Warming! ---> Possible collision", dis[i].track_id)
 
         #        for y in range(length):
         #            if (dis[i][0] == dis2[i][0]) and (dis[i][1] == dis2[i][1]) and (dis[i][2] == dis2[i][2]) and (dis[i][3] == dis2[i][3]):
@@ -285,32 +285,29 @@ def main(_argv):
 
 
 #Coords = { xmin, ymin, xmax, ymax}
-
+#Sugkrionoume tis suyntetagmenes kathe akrhs tou B tracker me tou A me skopo na doume spote to B einai mesa sto A
+        #Molis brrethei tetoia katastash stelnetai mhnhma kindunou
         if len(dis) > 0:
             length = len(dis)
             for i in range(length):
                 for y in range(length):
                     if i != y:
-                        if (((dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[0])) and (
-                                (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            dis1[i] = dis[i]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            dis1[i] = dis[i]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            dis1[i] = dis[i]
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
+                                (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            #dis1[i] = dis[i]
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
                             print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            dis1[i] = dis[i]
+                            #dis1[i] = dis[i]
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
                             print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            dis1[i] = dis[i]
+                            #dis1[i] = dis[i]
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
+                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
+                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
+                            #dis1[i] = dis[i]
 
         dis = []
 
