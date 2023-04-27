@@ -68,7 +68,7 @@ def main(_argv):
     nms_max_overlap = 1.0
 
     dis = []
-    dis1 = []
+    dis5 = []
     dis3 = []
 
     # initialize deep sort
@@ -129,7 +129,7 @@ def main(_argv):
             print('Video has ended or failed, try a different video format!')
             break
         frame_num += 1
-        print('Frame #: ', frame_num)
+        #print('Frame #: ', frame_num)
         frame_size = frame.shape[:2]
         image_data = cv2.resize(frame, (input_size, input_size))
         image_data = image_data / 255.
@@ -210,7 +210,7 @@ def main(_argv):
         if FLAGS.count:
             cv2.putText(frame, "Objects being tracked: {}".format(count), (5, 35), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2,
                         (0, 255, 0), 2)
-            print("Objects being tracked: {}".format(count))
+            #print("Objects being tracked: {}".format(count))
         # delete detections that are not in allowed_classes
         bboxes = np.delete(bboxes, deleted_indx, axis=0)
         scores = np.delete(scores, deleted_indx, axis=0)
@@ -243,7 +243,7 @@ def main(_argv):
             class_name = track.get_class()
 
             dis.append(track)
-            #dis2.append(bbox)
+            # dis2.append(bbox)
 
             # draw bbox on screen
             color = colors[int(track.track_id) % len(colors)]
@@ -268,7 +268,7 @@ def main(_argv):
         # Sthn parakatw epanalhpsh sugkrinoume tis times tou neou dis me tis times tou palioy dis2 gia kathe ena apo ta oxhmata auta
         # an kapoio apo auta exei thn idia timh paei na pei oti exei stamathsei na kinhte ara polu pithanon na exei ginei atuxhma
 
-        #if len(dis) > 0:
+        # if len(dis) > 0:
         #    length = len(dis)
         #    for i in range(length):
         #         print("The result is: ", dis[i].to_tlbr(), " + ", dis[i].get_class(), " + ", dis[i].track_id)
@@ -282,38 +282,93 @@ def main(_argv):
 
         # dis2 = []
         # dis3 = []
+        if frame_num == 30:
+            if len(dis5) > 0:
+                length = len(dis5)
+                for i in range(length):
+                    for y in range(len(dis)):
+                        if dis[y].track_id == dis5[i].track_id:
+                            if (dis[y].to_tlbr() == dis5[i].to_tlbr()).all():
+                                print("Possible collision --> ", dis5[i].track_id)
+                                #dis[y].to_tlbr() - 10 , dis[y].to_tlbr()
+
+        ####### Coords = { xmin, ymin, xmax, ymax} #######
 
 
-#Coords = { xmin, ymin, xmax, ymax}
-#Sugkrionoume tis suyntetagmenes kathe akrhs tou B tracker me tou A me skopo na doume spote to B einai mesa sto A
-        #Molis brrethei tetoia katastash stelnetai mhnhma kindunou
+        #Comparing the coords of each box's edge of the tracker B with the tracker A. With that way we can have an idea if
+        #one of the trackers is inside the other.
+        #Should that happen the list dis5 is being filled with the tracker's information.
+
         if len(dis) > 0:
             length = len(dis)
             for i in range(length):
                 for y in range(length):
                     if i != y:
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
-                                (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            #dis1[i] = dis[i]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            #dis1[i] = dis[i]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            #dis1[i] = dis[i]
-                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                            print("Warning possible collision!", dis[i].track_id, " ", dis[y].track_id)
-                            #dis1[i] = dis[i]
+                        exists = False
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (
+                                dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
+                                (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[0]) and (
+                                dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
+                            # print("Warning possible collision! at frame num: ", frame_num, " ", dis[i].track_id, " ", dis[y].track_id, "  ", dis[i].to_tlbr(), "  ", dis[y].to_tlbr())
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
+
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
+                                dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
+                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (
+                                dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
+                            # print("Warning possible collision! at frame num: ", frame_num, " ", dis[i].track_id, " ", dis[y].track_id,  "  ", dis[i].to_tlbr(), "  ", dis[y].to_tlbr())
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
+
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (
+                                dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
+                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
+                                dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
+                            # print("Warning possible collision! at frame num: ", frame_num, " ", dis[i].track_id, " ", dis[y].track_id,  "  ", dis[i].to_tlbr(), "  ", dis[y].to_tlbr())
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
+
+                        if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
+                                dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
+                                (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
+                                dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
+                            # print("Warning possible collision! at frame num: ", frame_num, " ", dis[i].track_id, " ", dis[y].track_id,  "  ", dis[i].to_tlbr(), "  ", dis[y].to_tlbr())
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
 
         dis = []
 
+        if frame_num == 30:
+            frame_num = 0
+
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
-        print("FPS: %.2f" % fps)
+        #print("FPS: %.2f" % fps)
         result = np.asarray(frame)
         result = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
@@ -325,6 +380,7 @@ def main(_argv):
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     try:
