@@ -265,26 +265,25 @@ def main(_argv):
             #                                                                                        int(bbox[2]),
             #                                                                                        int(bbox[3]))))
 
-
-        if frame_num == 120:
+        if frame_num == 200:
 
             if len(dis5) > 0:
-                length = len(dis3)
+                length = len(dis5)
                 for i in range(length):
                     for y in range(len(dis)):
                         if dis[y].track_id == dis5[i].track_id:
                             if (dis[y].to_tlbr() == dis5[i].to_tlbr()).all():
                                 print("Possible collision ------> ", dis5[i].to_tlbr(), "  ", dis[y].to_tlbr(), "1) ",
                                       dis5[i].track_id, "2) ", dis[y].track_id)
+
             if len(dis6) > 0:
-                length = len(dis2)
+                length = len(dis6)
                 for i in range(length):
                     for y in range(len(dis)):
                         if dis[y].track_id == dis6[i].track_id:
                             if (dis[y].to_tlbr() == dis6[i].to_tlbr()).all():
                                 print("Possible collision ------> ", dis6[i].to_tlbr(), "  ", dis[y].to_tlbr(), "1) ",
                                       dis6[i].track_id, "2) ", dis[y].track_id)
-
 
         ####### Coords = { xmin, ymin, xmax, ymax} #######
 
@@ -302,107 +301,103 @@ def main(_argv):
                                 dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
                                 (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[0]) and (
                                 dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            dis5.append(dis[i])
-                            dis6.append(dis[y])
-                            #if len(dis5) > 0:
-                            #    for a in range(len(dis5)):
-                            #        if dis5[a].track_id == dis[i].track_id:
-                            #            exists = True
-                            #    if exists == False:
-                            #        dis5.append(dis[i])
+                            print("Result: -> ", dis[y].to_tlbr(), " the result -> ", dis[y].track_id)
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if exists == False:
+                                    dis5.append(dis[i])
 
-                            #elif len(dis5) == 0:
-                            #    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
 
-                            #if len(dis6) > 0:
-                            #    for a in range(len(dis6)):
-                            #        if dis6[a].track_id == dis[y].track_id:
-                            #            exists = True
-                            #    if exists == False:
-                            #        dis6.append(dis[y])
+                            if len(dis6) > 0:
+                                for a in range(len(dis6)):
+                                    if dis6[a].track_id == dis[y].track_id:
+                                        exists = True
+                                if exists == False:
+                                    dis6.append(dis[y])
 
-                            #elif len(dis6) == 0:
-                            #    dis6.append(dis[y])
+                            elif len(dis6) == 0:
+                                dis6.append(dis[y])
 
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
                                 dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (
                                 dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                            dis5.append(dis[i])
-                            dis6.append(dis[y])
-                            #if len(dis5) > 0:
-                            #   for a in range(len(dis5)):
-                            #        if dis5[a].track_id == dis[i].track_id:
-                            #            exists = True
-                            #    if exists == False:
-                            #        dis5.append(dis[i])
+                            print("Result: -> ", dis[y].to_tlbr(), " the result -> ", dis[y].track_id)
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if exists == False:
+                                    dis5.append(dis[i])
 
-                            #elif len(dis5) == 0:
-                            #    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
 
-                            #if len(dis6) > 0:
-                            #    for a in range(len(dis6)):
-                            #        if dis6[a].track_id == dis[y].track_id:
-                            #            exists = True
-                            #    if (exists == False):
-                            #        dis6.append(dis[y])
+                            if len(dis6) > 0:
+                                for a in range(len(dis6)):
+                                    if dis6[a].track_id == dis[y].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis6.append(dis[y])
 
-                            #elif len(dis6) == 0:
-                            #    dis6.append(dis[y])
+                            elif len(dis6) == 0:
+                                dis6.append(dis[y])
 
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (
                                 dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
                                 dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                            dis5.append(dis[i])
-                            dis6.append(dis[y])
-                            #if len(dis5) > 0:
-                            #    for a in range(len(dis5)):
-                            #        if dis5[a].track_id == dis[i].track_id:
-                            #            exists = True
-                            #    if (exists == False):
-                            #        dis5.append(dis[i])
+                            print("Result: -> ", dis[y].to_tlbr(), " the result -> ", dis[y].track_id)
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
 
-                            #elif len(dis5) == 0:
-                            #    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
 
-                            #if len(dis6) > 0:
-                            #    for a in range(len(dis6)):
-                            #        if dis6[a].track_id == dis[y].track_id:
-                            #            exists = True
-                            #    if (exists == False):
-                            #        dis6.append(dis[y])
+                            if len(dis6) > 0:
+                                for a in range(len(dis6)):
+                                    if dis6[a].track_id == dis[y].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis6.append(dis[y])
 
-                            #elif len(dis6) == 0:
-                            #    dis6.append(dis[y])
+                            elif len(dis6) == 0:
+                                dis6.append(dis[y])
 
                         if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
                                 dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
                                 (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
                                 dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                            dis5.append(dis[i])
-                            dis6.append(dis[y])
-                            #if len(dis5) > 0:
-                            #    for a in range(len(dis5)):
-                            #        if dis5[a].track_id == dis[i].track_id:
-                            #            exists = True
-                            #    if (exists == False):
-                            #        dis5.append(dis[i])
-                            #elif len(dis5) == 0:
-                            #    dis5.append(dis[i])
+                            print("Result: -> ", dis[y].to_tlbr(), " the result -> ", dis[y].track_id)
+                            if len(dis5) > 0:
+                                for a in range(len(dis5)):
+                                    if dis5[a].track_id == dis[i].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis5.append(dis[i])
+                            elif len(dis5) == 0:
+                                dis5.append(dis[i])
 
-                            #if len(dis6) > 0:
-                            #    for a in range(len(dis6)):
-                            #        if dis6[a].track_id == dis[y].track_id:
-                            #            exists = True
-                            #    if (exists == False):
-                            #        dis6.append(dis[y])
-                            #elif len(dis6) == 0:
-                            #    dis6.append(dis[y])
+                            if len(dis6) > 0:
+                                for a in range(len(dis6)):
+                                    if dis6[a].track_id == dis[y].track_id:
+                                        exists = True
+                                if (exists == False):
+                                    dis6.append(dis[y])
+                            elif len(dis6) == 0:
+                                dis6.append(dis[y])
 
         dis = []
 
-        if frame_num == 120:
+        if frame_num == 200:
             frame_num = 0
             dis5 = []
             dis6 = []
