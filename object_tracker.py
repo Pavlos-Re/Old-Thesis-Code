@@ -1,5 +1,5 @@
 # IMPORTANT BEFORE RUNNING
-
+import multiprocessing
 # Run the command python save_model.py --model yolov4 to convert the yolov4 weights to tensorflow type
 # The following code is to create and save the yolov4 - tiny weights to tensorflow
 # python save_model.py --weights ./data/yolov4-tiny.weights --output ./checkpoints/yolov4-tiny-416 --model yolov4 --tiny
@@ -22,7 +22,6 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import time
 import tensorflow as tf
-import requests
 
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -68,8 +67,6 @@ def main(_argv):
     nms_max_overlap = 1.0
 
     dis = []
-    dis3 = []
-    dis2 = []
     dis5 = []
     dis6 = []
 
@@ -131,7 +128,7 @@ def main(_argv):
             print('Video has ended or failed, try a different video format!')
             break
         frame_num += 1
-        #print('Frame #: ', frame_num)
+        print('Frame #: ', frame_num)
         frame_size = frame.shape[:2]
         image_data = cv2.resize(frame, (input_size, input_size))
         image_data = image_data / 255.
@@ -267,197 +264,50 @@ def main(_argv):
 
         if frame_num == 200:
 
-            if len(dis5) > 0:
-                for i in range(len(dis5)):
-                    print("The result is: ", dis5[i].to_tlbr(), " and  5: ", dis5[i].track_id)
-                    for y in range(len(dis)):
-                        # print("The dis result is: ", dis[y].to_tlbr(), "   ", dis[y].track_id, "  ", frame_num)
-                        if i != y:
-                            if dis[y].track_id == dis5[i].track_id:
-                                if dis[y].to_tlbr()[0] == dis5[i].to_tlbr()[0] and dis[y].to_tlbr()[1] == \
-                                        dis5[i].to_tlbr()[1] and dis[y].to_tlbr()[2] == dis5[i].to_tlbr()[2] and \
-                                        dis[y].to_tlbr()[3] == dis5[i].to_tlbr()[3]:
-                                    print("Possible collision ------> ", dis5[i].to_tlbr(), "  ", dis[y].to_tlbr(),
-                                          "1) ",
-                                          dis5[i].track_id, "2) ", dis[y].track_id, "   ", frame_num)
+            dis2 = dis5
+            process = multiprocessing.Process(target=check(dis, dis2, frame))
 
-            if len(dis6) > 0:
-                for i in range(len(dis6)):
-                    print("The result is: ", dis6[i].to_tlbr(), " and 6: ", dis6[i].track_id)
-                    for y in range(len(dis)):
-                        # print("The dis result is: ", dis[y].to_tlbr(), "   ", dis[y].track_id, "   ", frame_num)
-                        if i != y:
-                            if dis[y].track_id == dis6[i].track_id:
-                                if dis[y].to_tlbr()[0] == dis6[i].to_tlbr()[0] and dis[y].to_tlbr()[1] == \
-                                        dis6[i].to_tlbr()[1] and dis[y].to_tlbr()[2] == dis6[i].to_tlbr()[2] and \
-                                        dis[y].to_tlbr()[3] == dis6[i].to_tlbr()[3]:
-                                    print("Possible collision ------> ", dis6[i].to_tlbr(), "  ", dis[y].to_tlbr(),
-                                          "1) ",
-                                          dis6[i].track_id, "2) ", dis[y].track_id, "  ", frame_num)
+            process.start()
 
         ####### Coords = { xmin, ymin, xmax, ymax} #######
 
         # Comparing the coords of each box's edge of the tracker B with the tracker A. With that way we can have an
         # idea if one of the trackers is inside the other. Should that happen the list dis5 is being filled with the
         # tracker's information.
-        if frame_num < 200:
+
+        # The Model can give the same ID to another vehicle if it looks like the first one it saw
+
+        if frame_num < 300:
             if len(dis) > 0:
                 length = len(dis)
                 for i in range(length):
                     for y in range(length):
                         if i != y:
                             exists = False
-                            if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (
-                                    dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
-                                    (dis[i].to_tlbr()[0] < dis[i].to_tlbr()[0]) and (
-                                    dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
+                            # There are quite a lot of false flags because the Model can be unsure for what it sees and change its label and id number.
+                            if dis[y].to_tlbr()[1] < ((dis[i].to_tlbr()[1] + dis[i].to_tlbr()[3]) / 2) < \
+                                    dis[y].to_tlbr()[3] and dis[y].to_tlbr()[0] < (
+                                    (dis[i].to_tlbr()[0] + dis[i].to_tlbr()[2]) / 2) < \
+                                    dis[y].to_tlbr()[2]:
                                 if len(dis5) > 0:
                                     for a in range(len(dis5)):
                                         if dis5[a].track_id == dis[i].track_id:
                                             exists = True
                                             dis5[a] = dis[i]
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
+                                            print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
                                     if exists == False:
                                         dis5.append(dis[i])
-                                        print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "  ",
-                                              frame_num)
-
+                                        print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
 
                                 elif len(dis5) == 0:
                                     dis5.append(dis[i])
 
-                                if len(dis6) > 0:
-                                    for a in range(len(dis6)):
-                                        if dis6[a].track_id == dis[y].track_id:
-                                            exists = True
-                                            dis6[a] = dis[y]
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-                                    if exists == False:
-                                        dis6.append(dis[y])
-                                        print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
+        dis.clear()
 
-                                elif len(dis6) == 0:
-                                    dis6.append(dis[y])
-
-                            if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
-                                    dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                    (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[0]) and (
-                                    dis[i].to_tlbr()[2] > dis[y].to_tlbr()[0]))):
-                                if len(dis5) > 0:
-                                    for a in range(len(dis5)):
-                                        if dis5[a].track_id == dis[i].track_id:
-                                            dis5[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if exists == False:
-                                        dis5.append(dis[i])
-                                        print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
-
-                                elif len(dis5) == 0:
-                                    dis5.append(dis[i])
-
-                                if len(dis6) > 0:
-                                    for a in range(len(dis6)):
-                                        if dis6[a].track_id == dis[y].track_id:
-                                            dis6[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if (exists == False):
-                                        print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
-                                        dis6.append(dis[y])
-
-                                elif len(dis6) == 0:
-                                    dis6.append(dis[y])
-
-                            if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[3]) and (
-                                    dis[i].to_tlbr()[3] > dis[y].to_tlbr()[3])) and (
-                                    (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
-                                    dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                                if len(dis5) > 0:
-                                    for a in range(len(dis5)):
-                                        if dis5[a].track_id == dis[i].track_id:
-                                            dis5[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if (exists == False):
-                                        dis5.append(dis[i])
-                                        print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
-
-
-                                elif len(dis5) == 0:
-                                    dis5.append(dis[i])
-
-                                if len(dis6) > 0:
-                                    for a in range(len(dis6)):
-                                        if dis6[a].track_id == dis[y].track_id:
-                                            dis6[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if (exists == False):
-                                        dis6.append(dis[y])
-                                        print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
-
-
-                                elif len(dis6) == 0:
-                                    dis6.append(dis[y])
-
-                            if (((dis[i].to_tlbr()[1] < dis[y].to_tlbr()[1]) and (
-                                    dis[i].to_tlbr()[3] > dis[y].to_tlbr()[1])) and (
-                                    (dis[i].to_tlbr()[0] < dis[y].to_tlbr()[2]) and (
-                                    dis[i].to_tlbr()[2] > dis[y].to_tlbr()[2]))):
-                                if len(dis5) > 0:
-                                    for a in range(len(dis5)):
-                                        if dis5[a].track_id == dis[i].track_id:
-                                            dis5[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if (exists == False):
-                                        dis5.append(dis[i])
-                                        print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "  ",
-                                              frame_num)
-
-                                elif len(dis5) == 0:
-                                    dis5.append(dis[i])
-
-                                if len(dis6) > 0:
-                                    for a in range(len(dis6)):
-                                        if dis6[a].track_id == dis[y].track_id:
-                                            dis6[a] = dis[i]
-                                            exists = True
-                                            print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                                  frame_num)
-
-                                    if (exists == False):
-                                        dis6.append(dis[y])
-                                        print("The result is: ", dis[i].track_id, " inside ", dis[i].to_tlbr(), "   ",
-                                              frame_num)
-
-                                elif len(dis6) == 0:
-                                    dis6.append(dis[y])
-
-        dis = []
-
-        if frame_num == 200:
+        if frame_num == 300:
             frame_num = 0
-            dis5 = []
-            dis6 = []
+            dis5.clear()
+            dis6.clear()
 
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
@@ -473,6 +323,20 @@ def main(_argv):
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
     cv2.destroyAllWindows()
+
+
+def check(dis, dis2, frame):
+    if len(dis2) > 0:
+        for i in range(len(dis2)):
+            for y in range(len(dis)):
+                # print("The dis result is: ", dis[y].to_tlbr(), "   ", dis[y].track_id, "  ", frame_num)
+                if i != y:
+                    if dis2[i].track_id == dis[y].track_id and dis2[i].class_name == dis[y].class_name:
+                        if dis[y].to_tlbr()[0] == dis2[i].to_tlbr()[0] and dis[y].to_tlbr()[1] == \
+                                dis2[i].to_tlbr()[1] and dis[y].to_tlbr()[2] == dis2[i].to_tlbr()[2] and \
+                                dis[y].to_tlbr()[3] == dis2[i].to_tlbr()[3]:
+                            print(dis2[i].track_id," <------ Possible collision ------> ", dis[y].track_id)
+                            image = Image.fromarray(frame)
 
 
 if __name__ == '__main__':

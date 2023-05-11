@@ -172,9 +172,6 @@ class KalmanFilter(object):
             Returns the measurement-corrected state distribution.
 
         """
-
-        #print("The result is: ", measurement)
-
         projected_mean, projected_cov = self.project(mean, covariance)
 
 
