@@ -59,7 +59,6 @@ flags.DEFINE_boolean('dont_show', False, 'dont show video output')
 flags.DEFINE_boolean('info', True, 'show detailed info of tracked objects')
 flags.DEFINE_boolean('count', True, 'count objects being tracked on screen')
 
-
 def main(_argv):
     # Definition of the parameters
     max_cosine_distance = 0.4
@@ -69,6 +68,7 @@ def main(_argv):
     dis = []
     dis5 = []
     dis6 = []
+    warnings = 0
 
     # initialize deep sort
     model_filename = 'model_data/mars-small128.pb'
@@ -128,7 +128,7 @@ def main(_argv):
             print('Video has ended or failed, try a different video format!')
             break
         frame_num += 1
-        print('Frame #: ', frame_num)
+#        print('Frame #: ', frame_num)
         frame_size = frame.shape[:2]
         image_data = cv2.resize(frame, (input_size, input_size))
         image_data = image_data / 255.
@@ -264,10 +264,22 @@ def main(_argv):
 
         if frame_num == 200:
 
-            dis2 = dis5
-            process = multiprocessing.Process(target=check(dis, dis2, frame))
-
-            process.start()
+            if len(dis5) > 0:
+                for i in range(len(dis5)):
+                    for y in range(len(dis)):
+                        # print("The dis result is: ", dis[y].to_tlbr(), "   ", dis[y].track_id, "  ", frame_num)
+                        if i != y:
+                            if dis5[i].track_id == dis[y].track_id and dis5[i].class_name == dis[y].class_name:
+                                if dis[y].to_tlbr()[0] == dis5[i].to_tlbr()[0] and dis[y].to_tlbr()[1] == \
+                                        dis5[i].to_tlbr()[1] and dis[y].to_tlbr()[2] == dis5[i].to_tlbr()[2] and \
+                                        dis[y].to_tlbr()[3] == dis5[i].to_tlbr()[3]:
+                                    print(dis5[i].track_id, " <------ Possible collision ------> ", dis[y].track_id)
+                                    if dis5[i].class_name == "person" or dis[y].class_name == "person":
+                                        print(" <------ Possible Accident Involving Human ------> ")
+                                    if dis5[i].class_name == "motorbike" or dis[y].class_name == "motorbike":
+                                        print(" <------ Possible Accident Involving Motorbike ------> ")
+                                    image = Image.fromarray(frame)
+                                    warnings = warnings + 1
 
         ####### Coords = { xmin, ymin, xmax, ymax} #######
 
@@ -294,10 +306,10 @@ def main(_argv):
                                         if dis5[a].track_id == dis[i].track_id:
                                             exists = True
                                             dis5[a] = dis[i]
-                                            print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
+                                            #print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
                                     if exists == False:
                                         dis5.append(dis[i])
-                                        print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
+                                        #print("The result is: ", dis[i].track_id, " inside  ", dis[y].track_id)
 
                                 elif len(dis5) == 0:
                                     dis5.append(dis[i])
@@ -311,7 +323,7 @@ def main(_argv):
 
         # calculate frames per second of running detections
         fps = 1.0 / (time.time() - start_time)
-        # print("FPS: %.2f" % fps)
+        print("FPS: %.2f" % fps)
         result = np.asarray(frame)
         result = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
@@ -322,22 +334,9 @@ def main(_argv):
         if FLAGS.output:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
+
+    print("The number of warnings is: ", warnings)
     cv2.destroyAllWindows()
-
-
-def check(dis, dis2, frame):
-    if len(dis2) > 0:
-        for i in range(len(dis2)):
-            for y in range(len(dis)):
-                # print("The dis result is: ", dis[y].to_tlbr(), "   ", dis[y].track_id, "  ", frame_num)
-                if i != y:
-                    if dis2[i].track_id == dis[y].track_id and dis2[i].class_name == dis[y].class_name:
-                        if dis[y].to_tlbr()[0] == dis2[i].to_tlbr()[0] and dis[y].to_tlbr()[1] == \
-                                dis2[i].to_tlbr()[1] and dis[y].to_tlbr()[2] == dis2[i].to_tlbr()[2] and \
-                                dis[y].to_tlbr()[3] == dis2[i].to_tlbr()[3]:
-                            print(dis2[i].track_id," <------ Possible collision ------> ", dis[y].track_id)
-                            image = Image.fromarray(frame)
-
 
 if __name__ == '__main__':
     try:
