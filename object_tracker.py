@@ -17,7 +17,8 @@ import multiprocessing
 # python object_tracker.py --weights ./checkpoints/yolov4-tiny-416 --model yolov4 --video 0 --tiny
 
 import os
-
+import socket
+from PIL import Image
 # comment out below line to enable tensorflow logging outputs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import time
@@ -278,7 +279,22 @@ def main(_argv):
                                         print(" <------ Possible Accident Involving Human ------> ")
                                     if dis5[i].class_name == "motorbike" or dis[y].class_name == "motorbike":
                                         print(" <------ Possible Accident Involving Motorbike ------> ")
-                                    image = Image.fromarray(frame)
+
+                                    Image.fromarray(frame).save('test.jpg')
+                                    im = Image.open("test.jpg")
+                                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                    client.connect(('localhost', 1002))
+
+                                    file = open("test.jpg", 'rb')
+                                    image_data = file.read(2048)
+
+                                    while image_data:
+                                        client.send(image_data)
+                                        image_data = file.read(2048)
+
+                                    file.close()
+                                    client.close()
+
                                     warnings = warnings + 1
 
         ####### Coords = { xmin, ymin, xmax, ymax} #######
