@@ -283,7 +283,7 @@ def main(_argv):
                                     Image.fromarray(frame).save('test.jpg')
                                     im = Image.open("test.jpg")
                                     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                    client.connect(('localhost', 1002))
+                                    client.connect(('192.168.1.10', 1002))
 
                                     file = open("test.jpg", 'rb')
                                     image_data = file.read(2048)
